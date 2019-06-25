@@ -58,6 +58,8 @@ int cmd3;
 int autoSensorBaud2 = 0; // in USART2_IT_init
 int autoSensorBaud3 = 0; // in USART3_IT_init
 
+bool SoftWatchdogActive= false;
+
 int sensor_control = 0;
 
 #ifdef READ_SENSOR
@@ -117,7 +119,12 @@ void poweroff() {
         enable = 0;
         for (int i = 0; i < 8; i++) {
             buzzerFreq = i;
-            HAL_Delay(100);
+            for(int j = 0; j < 100; j++) {
+                #ifdef SOFTWATCHDOG_TIMEOUT
+                    __HAL_TIM_SET_COUNTER(&htim3, 0); // Kick the Watchdog
+                #endif
+                HAL_Delay(1);
+            }
         }
         HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
 
@@ -429,6 +436,11 @@ int main(void) {
   // uses timeStats.bldc_freq
   BldcControllerParams.callFrequency = timeStats.bldc_freq;
   BldcController_Init();
+
+#ifdef SOFTWATCHDOG_TIMEOUT
+  MX_TIM3_Softwatchdog_Init(); // Start the WAtchdog
+  SoftWatchdogActive= true;
+#endif
 
   while(1) {
     timeStats.time_in_us = timeStats.now_us;
@@ -897,6 +909,11 @@ int main(void) {
     // select next loop start point
     // move out '5ms' trigger on by 5ms
     timeStats.start_processing_us = timeStats.start_processing_us + timeStats.nominal_delay_us;
+
+#ifdef SOFTWATCHDOG_TIMEOUT
+    __HAL_TIM_SET_COUNTER(&htim3, 0); // Kick the Watchdog
+#endif
+
   }
 }
 

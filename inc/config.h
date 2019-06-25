@@ -89,7 +89,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART2
     #define SERIAL_USART2_IT
-    //#define DEBUG_SERIAL_ASCII
+    #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
 
@@ -98,7 +98,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART3
     #define SERIAL_USART3_IT
-    //#define DEBUG_SERIAL_ASCII
+    #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
 
@@ -136,20 +136,20 @@
 #ifndef SOFTWARE_SERIAL_RX_PORT
   #define SOFTWARE_SERIAL_RX_PORT GPIOB
 #endif
-#ifndef   SOFTWARE_SERIAL_TX_PIN  
+#ifndef   SOFTWARE_SERIAL_TX_PIN
   #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
 #endif
-#ifndef   SOFTWARE_SERIAL_TX_PORT  
+#ifndef   SOFTWARE_SERIAL_TX_PORT
   #define SOFTWARE_SERIAL_TX_PORT GPIOC
 #endif
 #ifndef FLASH_DEFAULT_HOVERBOARD_ENABLE
   #define FLASH_DEFAULT_HOVERBOARD_ENABLE 1
 #endif
 #ifndef USART2_BAUD
-  #define USART2_BAUD 26315        
+  #define USART2_BAUD 26315
 #endif
 #ifndef USART3_BAUD
-  #define USART3_BAUD 26315        
+  #define USART3_BAUD 26315
 #endif
 #ifndef SERIAL_USART_IT_BUFFERTYPE
   #define SERIAL_USART_IT_BUFFERTYPE unsigned short
@@ -176,11 +176,13 @@
 #endif
 #ifndef DELAY_IN_MAIN_LOOP
   #define DELAY_IN_MAIN_LOOP 5        // in ms. default 5. it is independent of all the timing critical stuff. do not touch if you do not know what you are doing.
-#endif 
+#endif
 
 #ifndef TIMEOUT
   #define TIMEOUT          5          // number of wrong / missing input commands before emergency off
 #endif
+//#define SOFTWATCHDOG_TIMEOUT 10     // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
+
 // ############################### GENERAL ###############################
 
 // ############################### MOTOR CONTROL (overwrite) #########################
@@ -204,7 +206,7 @@
 // Battery voltage calibration: connect power source. see <How to calibrate>. write value nr 5 to BAT_CALIB_ADC. make and flash firmware. then you can verify voltage on value 6 (devide it by 100.0 to get calibrated voltage).
 #ifndef BAT_CALIB_REAL_VOLTAGE
   #define BAT_CALIB_REAL_VOLTAGE        43.0       // input voltage measured by multimeter
-#endif 
+#endif
 #ifndef BAT_CALIB_ADC
   #define BAT_CALIB_ADC                 1704       // adc-value measured by mainboard (value nr 4 on UART debug output)
 #endif
@@ -226,7 +228,7 @@
 #ifndef BAT_LOW_LVL2
   #define BAT_LOW_LVL2            3.5       // your battery is almost empty. Charge now! [V/cell]
 #endif
-#ifndef BAT_LOW_DEAD  
+#ifndef BAT_LOW_DEAD
   #define BAT_LOW_DEAD            3.37      // undervoltage poweroff. (while not driving) [V/cell]
 #endif
 

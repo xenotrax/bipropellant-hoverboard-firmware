@@ -45,6 +45,7 @@ extern I2C_HandleTypeDef hi2c2;
 
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
+extern TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN 0 */
 
@@ -285,7 +286,7 @@ void EXTI9_5_IRQHandler(void)
     __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_9);
     triggered |= GPIO_PIN_9;
   }
-  
+
   if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_8) != RESET)
   {
     /* Clear the EXTI line 9 pending bit */
@@ -312,7 +313,7 @@ void EXTI9_5_IRQHandler(void)
     __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
     triggered |= GPIO_PIN_5;
   }
- 
+
 #ifdef HALL_INTERRUPTS
   if (triggered & HALL_PIN_MASK)
     HallInterruptsInterrupt();
@@ -324,7 +325,7 @@ void EXTI9_5_IRQHandler(void)
       softwareserialRXInterrupt();
   }
 #endif
-} 
+}
 
 /////////////////////////////////////////////////////////////////////
 // actual IRQ for RIGHT pins 10, 11, 12
@@ -337,7 +338,7 @@ void EXTI15_10_IRQHandler(void)
     __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_15);
     triggered |= GPIO_PIN_15;
   }
-  
+
   if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_14) != RESET)
   {
     /* Clear the EXTI line 9 pending bit */
@@ -381,7 +382,7 @@ void EXTI15_10_IRQHandler(void)
   }
 #endif
 
-} 
+}
 // end EXTI
 /////////////////////////////////////////
 
@@ -389,7 +390,7 @@ void EXTI15_10_IRQHandler(void)
 /////////////////////////////////////////
 // timer interrupts
 
-// 
+//
 // TIM2 is used in softwareserial, but without interrupts.
 // void TIM3_IRQHandler(void) - defined in softwareserial.c
 // void TIM4_IRQHandler(void) - defined in hallinterrupts.c
@@ -454,6 +455,21 @@ void DMA1_Channel7_IRQHandler(void)
 /* please refer to the startup file (startup_stm32f1xx.s).                    */
 /******************************************************************************/
 
+#ifdef SOFTWATCHDOG_TIMEOUT
+/**
+* @brief This function handles TIM3 global interrupt.
+*/
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+
+  /* USER CODE END TIM3_IRQn 1 */
+}
+#endif
 
 /* USER CODE BEGIN 1 */
 
