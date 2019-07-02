@@ -704,7 +704,9 @@ int main(void) {
       #if defined CONTROL_ADC
         if(ADCcontrolActive) {
           if(ADC_SQUARED_STEER) {
-            cmd1 = cmd1_ADC*cmd1_ADC;
+            cmd1 = cmd1_ADC * abs(cmd1_ADC);
+          } else if(ADC_RELATIVE_STEER) {
+            cmd1 = cmd1_ADC * abs(cmd2_ADC);
           } else {
             cmd1 = cmd1_ADC;
           }
