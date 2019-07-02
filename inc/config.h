@@ -346,6 +346,10 @@
   #define ADC_REVERSE_STEER 1         // define if ADC1 is used for Steer and ADC2 for Speed
 #endif
 
+#ifndef ADC_QUADRATIC_STEER
+  #define ADC_SQUARED_STEER 0         // define if Steering be not be linear but squared
+#endif
+
 #ifndef ADC_TANKMODE
   #define ADC_TANKMODE 0              // define if each input should control one wheel
 #endif

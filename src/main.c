@@ -703,7 +703,11 @@ int main(void) {
 
       #if defined CONTROL_ADC
         if(ADCcontrolActive) {
-          cmd1 = cmd1_ADC;
+          if(ADC_SQUARED_STEER) {
+            cmd1 = cmd1_ADC*cmd1_ADC;
+          } else {
+            cmd1 = cmd1_ADC;
+          }
           cmd2 = cmd2_ADC;
           input_timeout_counter = 0;
         }
