@@ -33,3 +33,9 @@ void USART3_IT_init();
 
 void setUSART2ToControl();
 extern int USART2ProtocolEnable;
+
+
+#ifdef SOFTWATCHDOG_TIMEOUT
+  void MX_TIM3_Softwatchdog_Init(void);
+  extern TIM_HandleTypeDef htim3;
+#endif

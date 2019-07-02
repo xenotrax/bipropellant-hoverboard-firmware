@@ -89,7 +89,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART2
     #define SERIAL_USART2_IT
-    //#define DEBUG_SERIAL_ASCII
+    #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
 
@@ -98,7 +98,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART3
     #define SERIAL_USART3_IT
-    //#define DEBUG_SERIAL_ASCII
+    #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
 
@@ -181,6 +181,8 @@
 #ifndef INPUT_TIMEOUT
   #define INPUT_TIMEOUT    30         // number of wrong / missing input commands before wheels are disabled
 #endif
+//#define SOFTWATCHDOG_TIMEOUT 10     // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
+
 // ############################### GENERAL ###############################
 
 // ############################### MOTOR CONTROL (overwrite) #########################
