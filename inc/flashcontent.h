@@ -30,12 +30,10 @@
 // decimal to make it easier to type!
 #pragma once
 
-#define CURRENT_MAGIC 1234
+#define CURRENT_MAGIC 1235
 
-#pragma pack(push, 2) // all variables of type unsigned short (2 bytes)
-typedef struct tag_FLASH_CONTENT{
-    unsigned short magic;  // write this with CURRENT_MAGIC to commit to flash
-
+#pragma pack(push, 2)
+typedef struct tag_CONFIG_PID{
     unsigned short PositionKpx100; // pid params for Position
     unsigned short PositionKix100;
     unsigned short PositionKdx100;
@@ -45,14 +43,58 @@ typedef struct tag_FLASH_CONTENT{
     unsigned short SpeedKix100;
     unsigned short SpeedKdx100;
     unsigned short SpeedPWMIncrementLimit; // e.g. 20
+} CONFIG_PID;
+#pragma pack(pop)
 
-    unsigned short MaxCurrLim;
-
+#pragma pack(push, 2)
+typedef struct tag_CONFIG_HOVERBOARD{
     unsigned short HoverboardEnable; // non zero to enable
     unsigned short calibration_0;
     unsigned short calibration_1;
     unsigned short HoverboardPWMLimit;
+} CONFIG_HOVERBOARD;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
+typedef struct tag_CONFIG_MOTORS{
+  char motor1_invert;
+  char motor2_invert;
+  unsigned short MaxCurrLim;
+} CONFIG_MOTORS;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct tag_CONFIG_ANALOGINPUT{
+  unsigned short adc1_min;
+  unsigned short adc1_zero;
+  unsigned short adc1_max;
+  float adc1_mult_neg;
+  float adc1_mult_pos;
+  unsigned short adc1_button_threshold;
+
+  unsigned short adc2_min;
+  unsigned short adc2_zero;
+  unsigned short adc2_max;
+  float adc2_mult_neg;
+  float adc2_mult_pos;
+  unsigned short adc2_button_threshold;
+
+  unsigned short chan1_off_start;
+  unsigned short chan1_off_end;
+  float chan1_off_filter;
+
+  char switch_channels;
+  char chan2_reverse;
+} CONFIG_ANALOGINPUT;
+#pragma pack(pop)
+
+#pragma pack(push, 2) // all variables of type unsigned short (2 bytes)
+typedef struct tag_FLASH_CONTENT{
+    unsigned short magic;  // write this with CURRENT_MAGIC to commit to flash
+    CONFIG_PID cfg_pid;
+    CONFIG_HOVERBOARD cfg_hoverboard;
+    CONFIG_MOTORS cfg_motors;
+    CONFIG_ANALOGINPUT cfg_analoginput;
 } FLASH_CONTENT;
 #pragma pack(pop)
 
