@@ -39,6 +39,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 void BldcController_Init();
 
 void SystemClock_Config(void);
@@ -52,10 +53,9 @@ extern I2C_HandleTypeDef hi2c2;
 extern UART_HandleTypeDef huart2;
 
 extern volatile long long bldc_counter;
-int cmd1;
-double cmd1_ADC, adcrFiltered;  // normalized input values. -1000 to 1000
-int cmd2;
-double cmd2_ADC, adctFiltered;
+int cmd1, cmd2;                      // normalized input values. -1000 to 1000
+double cmd1_ADC, cmd2_ADC;           // ADC input values
+double adcrFiltered, adctFiltered;
 
 // used if set in setup.c
 int autoSensorBaud2 = 0; // in USART2_IT_init
@@ -502,15 +502,15 @@ int main(void) {
 
 
       if(adc_buffer.l_tx2 < ADC1_ZERO) {
-        cmd1_ADC = (CLAMP((double)adc_buffer.l_tx2, ADC1_MIN, ADC1_ZERO) - ADC1_ZERO) / ((ADC1_ZERO - ADC1_MIN) / ADC1_MULT_NEG); // ADC1 - Steer
+        cmd1_ADC = (double)(CLAMP(adc_buffer.l_tx2, ADC1_MIN, ADC1_ZERO) - ADC1_ZERO) / ((double)(ADC1_ZERO - ADC1_MIN) / ADC1_MULT_NEG); // ADC1 - Steer
       } else {
-        cmd1_ADC = (CLAMP((double)adc_buffer.l_tx2, ADC1_ZERO, ADC1_MAX) - ADC1_ZERO) / ((ADC1_MAX - ADC1_ZERO) / ADC1_MULT_POS); // ADC1 - Steer
+        cmd1_ADC = (double)(CLAMP(adc_buffer.l_tx2, ADC1_ZERO, ADC1_MAX) - ADC1_ZERO) / ((double)(ADC1_MAX - ADC1_ZERO) / ADC1_MULT_POS); // ADC1 - Steer
       }
 
       if(adc_buffer.l_rx2 < ADC2_ZERO) {
-        cmd2_ADC = (CLAMP(adc_buffer.l_rx2, ADC2_MIN, ADC2_ZERO) - ADC2_ZERO) / ((ADC2_ZERO - ADC2_MIN) / ADC2_MULT_NEG); // ADC2 - Speed
+        cmd2_ADC = (double)(CLAMP(adc_buffer.l_rx2, ADC2_MIN, ADC2_ZERO) - ADC2_ZERO) / ((double)(ADC2_ZERO - ADC2_MIN) / ADC2_MULT_NEG); // ADC2 - Speed
       } else {
-        cmd2_ADC = (CLAMP(adc_buffer.l_rx2, ADC2_ZERO, ADC2_MAX) - ADC2_ZERO) / ((ADC2_MAX - ADC2_ZERO) / ADC2_MULT_POS); // ADC2 - Speed
+        cmd2_ADC = (double)(CLAMP(adc_buffer.l_rx2, ADC2_ZERO, ADC2_MAX) - ADC2_ZERO) / ((double)(ADC2_MAX - ADC2_ZERO) / ADC2_MULT_POS); // ADC2 - Speed
       }
 
       if(ADC_SWITCH_CHANNELS) {
@@ -541,6 +541,15 @@ int main(void) {
       if(ADC_REVERSE_STEER) {
         cmd1_ADC = -cmd1_ADC;
       }
+
+      if(ADC_SQUARED_STEER) {
+        cmd1_ADC = cmd1_ADC * fabs(cmd1_ADC);
+      }
+
+
+      cmd1_ADC = cmd1_ADC * (1.0 + (fabs(cmd2_ADC) * ADC_RELATIVE_STEER));
+
+
       // use ADCs as button inputs:
       button1_ADC = (uint8_t)(adc_buffer.l_tx2 > 2000);  // ADC1
       button2_ADC = (uint8_t)(adc_buffer.l_rx2 > 2000);  // ADC2
@@ -716,15 +725,74 @@ int main(void) {
       }
 
       #if defined CONTROL_ADC
+
         if(ADCcontrolActive) {
-          if(ADC_SQUARED_STEER) {
-            cmd1 = cmd1_ADC * abs((int)cmd1_ADC);
-          } else if(ADC_RELATIVE_STEER) {
-            cmd1 = cmd1_ADC * ((100.0 + (abs((int)cmd2_ADC))/10.0)/100.0);
-          } else {
-            cmd1 = cmd1_ADC;
+
+#ifdef ADC_SPEED_CONTROL
+          control_type = CONTROL_TYPE_SPEED;
+          SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
+          SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+
+
+          if ((last_control_type != control_type) || (!enable)){
+            // nasty things happen if it's not re-initialised
+            init_PID_control();
+            last_control_type = control_type;
           }
+
+
+
+
+
+              for (int i = 0; i < 2; i++){
+                // average speed over all the loops until pid_need_compute() returns !=0
+#ifdef HALL_INTERRUPTS
+                SpeedPidFloats[i].in += HallData[i].HallSpeed_mm_per_s;
+#endif
+                SpeedPidFloats[i].count++;
+                if (!enable){ // don't want anything building up
+                  SpeedPidFloats[i].in = 0;
+                  SpeedPidFloats[i].count = 1;
+                }
+                if (pid_need_compute(&SpeedPid[i])) {
+                  // Read process feedback
+                  int belowmin = 0;
+                  // won't work below about 45
+                  if (ABS(SpeedData.wanted_speed_mm_per_sec[i]) < SpeedData.speed_minimum_speed){
+                    SpeedPidFloats[i].set = 0;
+                    belowmin = 1;
+                  } else {
+                    SpeedPidFloats[i].set = SpeedData.wanted_speed_mm_per_sec[i];
+                  }
+                  SpeedPidFloats[i].in = SpeedPidFloats[i].in/(float)SpeedPidFloats[i].count;
+                  SpeedPidFloats[i].count = 0;
+                  // Compute new PID output value
+                  pid_compute(&SpeedPid[i]);
+                  //Change actuator value
+                  int pwm = SpeedPidFloats[i].out;
+                  if (belowmin){
+                    pwms[i] = 0;
+                  } else {
+                    pwms[i] =
+                      CLAMP(pwms[i] + pwm, -SpeedData.speed_max_power, SpeedData.speed_max_power);
+                  }
+                  #ifdef LOG_PWM
+                  if (i == 0){
+                    sprintf(tmp, "%d:%d(%d) S:%d H:%d\r\n", i, pwms[i], pwm, (int)SpeedPidFloats[i].set, (int)SpeedPidFloats[i].in);
+                    consoleLog(tmp);
+                  }
+                  #endif
+                }
+              }
+
+#else
+
+          cmd1 = cmd1_ADC;
           cmd2 = cmd2_ADC;
+
+#endif
+
+
           input_timeout_counter = 0;
         }
       #endif
@@ -753,8 +821,10 @@ int main(void) {
           pwms[0] = pwms[0] * (1.0 - FILTER) + cmd1 * FILTER;
           pwms[1] = pwms[1] * (1.0 - FILTER) + cmd2 * FILTER;
         } else {
-          pwms[0] = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
-          pwms[1] = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+          #ifndef ADC_SPEED_CONTROL
+            pwms[0] = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
+            pwms[1] = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+          #endif
         }
       }
 

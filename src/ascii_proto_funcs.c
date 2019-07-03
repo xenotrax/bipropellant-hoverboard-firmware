@@ -97,7 +97,7 @@ static int steerB = 0;
 static char *control_types[]={
     "none",
     "Position",
-    "Speed (disabled)",
+    "Speed",
     "PWM Direct"
 };
 
