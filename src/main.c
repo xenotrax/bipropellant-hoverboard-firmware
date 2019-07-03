@@ -38,6 +38,7 @@
 #include "control_structures.h"
 
 #include <string.h>
+#include <stdlib.h>
 void BldcController_Init();
 
 void SystemClock_Config(void);
@@ -51,8 +52,10 @@ extern I2C_HandleTypeDef hi2c2;
 extern UART_HandleTypeDef huart2;
 
 extern volatile long long bldc_counter;
-int cmd1, cmd1_ADC, adcrFiltered;  // normalized input values. -1000 to 1000
-int cmd2, cmd2_ADC, adctFiltered;
+int cmd1;
+double cmd1_ADC, adcrFiltered;  // normalized input values. -1000 to 1000
+int cmd2;
+double cmd2_ADC, adctFiltered;
 
 // used if set in setup.c
 int autoSensorBaud2 = 0; // in USART2_IT_init
@@ -493,15 +496,15 @@ int main(void) {
 #ifdef CONTROL_ADC
       // ADC values range: 0-4095, see ADC-calibration in config.h
 
-      adcrFiltered = adcrFiltered * (1.0 - ADC_OFF_FILTER) + adc_buffer.l_rx2 * ADC_OFF_FILTER;
-      adctFiltered = adctFiltered * (1.0 - ADC_OFF_FILTER) + adc_buffer.l_tx2 * ADC_OFF_FILTER;
+      adcrFiltered = adcrFiltered * (1.0 - ADC_OFF_FILTER) + (double)adc_buffer.l_rx2 * ADC_OFF_FILTER;
+      adctFiltered = adctFiltered * (1.0 - ADC_OFF_FILTER) + (double)adc_buffer.l_tx2 * ADC_OFF_FILTER;
 
 
 
       if(adc_buffer.l_tx2 < ADC1_ZERO) {
-        cmd1_ADC = (CLAMP(adc_buffer.l_tx2, ADC1_MIN, ADC1_ZERO) - ADC1_ZERO) / ((ADC1_ZERO - ADC1_MIN) / ADC1_MULT_NEG); // ADC1 - Steer
+        cmd1_ADC = (CLAMP((double)adc_buffer.l_tx2, ADC1_MIN, ADC1_ZERO) - ADC1_ZERO) / ((ADC1_ZERO - ADC1_MIN) / ADC1_MULT_NEG); // ADC1 - Steer
       } else {
-        cmd1_ADC = (CLAMP(adc_buffer.l_tx2, ADC1_ZERO, ADC1_MAX) - ADC1_ZERO) / ((ADC1_MAX - ADC1_ZERO) / ADC1_MULT_POS); // ADC1 - Steer
+        cmd1_ADC = (CLAMP((double)adc_buffer.l_tx2, ADC1_ZERO, ADC1_MAX) - ADC1_ZERO) / ((ADC1_MAX - ADC1_ZERO) / ADC1_MULT_POS); // ADC1 - Steer
       }
 
       if(adc_buffer.l_rx2 < ADC2_ZERO) {
@@ -511,7 +514,7 @@ int main(void) {
       }
 
       if(ADC_SWITCH_CHANNELS) {
-        int cmdTemp = cmd1_ADC;
+        double cmdTemp = cmd1_ADC;
         cmd1_ADC = cmd2_ADC;
         cmd2_ADC = cmdTemp;
         if((adctFiltered < ADC_OFF_START) || (adctFiltered > ADC_OFF_END) ) {
@@ -715,9 +718,9 @@ int main(void) {
       #if defined CONTROL_ADC
         if(ADCcontrolActive) {
           if(ADC_SQUARED_STEER) {
-            cmd1 = cmd1_ADC * abs(cmd1_ADC);
+            cmd1 = cmd1_ADC * abs((int)cmd1_ADC);
           } else if(ADC_RELATIVE_STEER) {
-            cmd1 = cmd1_ADC * abs(cmd2_ADC);
+            cmd1 = cmd1_ADC * ((100.0 + (abs((int)cmd2_ADC))/10.0)/100.0);
           } else {
             cmd1 = cmd1_ADC;
           }
