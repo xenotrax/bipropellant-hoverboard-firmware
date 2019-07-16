@@ -771,6 +771,8 @@ int main(void) {
         sensor_send_lights();
       #endif
 
+    #else // INCLUDE_PROTOCOL)||defined(CONTROL_SENSOR)
+      }
     #endif // INCLUDE_PROTOCOL)||defined(CONTROL_SENSOR)
 
       // ####### LOW-PASS FILTER #######
