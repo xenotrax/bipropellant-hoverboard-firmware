@@ -26,7 +26,6 @@
     // this control type allows the board to be used AS a hoverboard,
     // responding to sensor movements when in hoverboard mode.
     /// and uses softwareserial for serial control on B2/C9
-    #define READ_SENSOR
     #define CONTROL_SENSOR
     #define SOFTWARE_SERIAL
     #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
@@ -50,7 +49,6 @@
     // this control type allows the board to be used AS a hoverboard,
     // responding to sensor movements when in hoverboard mode.
     /// and uses softwareserial for serial control on B2/C9
-    #define READ_SENSOR
     #define CONTROL_SENSOR
     #define SOFTWARE_SERIAL
     #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
@@ -101,13 +99,6 @@
     #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
-
-// ############################### ENABLE FLASH STORAGE MECHANISM ###############################
-// this includes flasharea.c and flashaccess.c
-  #define FLASH_STORAGE 1
-
-// ############################### ENABLE INTERRUPT READING OF HALL SENSORS FOR POSITION ###############################
-  #define HALL_INTERRUPTS 1
 
   // **************** NOTE!!!! ******
 #endif // IGNORE_GLOBAL_CONFIG
@@ -381,8 +372,6 @@
 #ifndef INCLUDE_PROTOCOL
   #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
 #endif
-// Log PWM value in position/speed control mode
-//define LOG_PWM
 
 // ############################### DRIVING BEHAVIOR ###############################
 

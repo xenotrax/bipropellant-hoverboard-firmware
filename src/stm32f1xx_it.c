@@ -314,10 +314,8 @@ void EXTI9_5_IRQHandler(void)
     triggered |= GPIO_PIN_5;
   }
 
-#ifdef HALL_INTERRUPTS
   if (triggered & HALL_PIN_MASK)
     HallInterruptsInterrupt();
-#endif
 
 // shared interrupt for these pins, depending on where the sfotware serial pin is
 #ifdef SOFTWARE_SERIAL
@@ -371,10 +369,9 @@ void EXTI15_10_IRQHandler(void)
     triggered |= GPIO_PIN_10;
   }
 
-#ifdef HALL_INTERRUPTS
   if (triggered & HALL_PIN_MASK)
     HallInterruptsInterrupt();
-#endif
+
 // shared interrupt for these pins, depending on where the sfotware serial pin is
 #ifdef SOFTWARE_SERIAL
   if (triggered & SOFTWARE_SERIAL_RX_PIN){

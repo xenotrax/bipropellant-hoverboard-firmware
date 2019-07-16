@@ -11,12 +11,12 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // this file encapsulates coms with the original sensor boards
 // these use the 9 bit USART mode, sending 0x100 to signal the END of a comms frame
-// it uses CONTROL_SENSOR, CONTROL_BAUD (52177 for GD32 based YST board) and DEBUG_SERIAL_SENSOR 
-// Implements Interrupt driven USART2 & USART3 with buffers, 
+// it uses CONTROL_SENSOR, CONTROL_BAUD (52177 for GD32 based YST board) and DEBUG_SERIAL_SENSOR
+// Implements Interrupt driven USART2 & USART3 with buffers,
 // and uses 9 bit serial.
 /////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef READ_SENSOR
+#ifdef CONTROL_SENSOR
 
 ////////////////////////////////////////////////////////////////
 // code to read and interpret sensors
@@ -43,7 +43,7 @@ int USART_sensorSend(int port, unsigned char *data, int len, int endframe){
         }
         USART_sensor_addTXshort( port, (unsigned short) c );
     }
-    
+
     USART_sensor_starttx(port);
     return 1;
 }
@@ -65,7 +65,7 @@ int USART_sensor_txcount(int port){
 void USART_sensor_addTXshort(int port, SERIAL_USART_IT_BUFFERTYPE value) {
     if (port == 0){
         return serial_usart_buffer_push(&usart2_it_TXbuffer, value);
-    }  
+    }
     return serial_usart_buffer_push(&usart3_it_TXbuffer, value);
 }
 
@@ -137,7 +137,7 @@ void sensor_copy_buffer(SENSOR_DATA *s){
         sprintf(t, "angle change > 200 %d -> %d:\r\n", s->last_angle, f->Angle);
         consoleLog(t);
     }
-    
+
     if (copy) {
         if (count != sizeof(s->complete)){
             memset(&s->complete, 0, sizeof(s->complete));
@@ -206,7 +206,7 @@ void sensor_read_data(){
         };
 
         // we may have read more than one message here (process>1)
-        if (process) { 
+        if (process) {
             if (s->read_timeout == 0) {
                 consoleLog("Sensor RX received\r\n");
             }
@@ -230,7 +230,7 @@ void sensor_read_data(){
                 } else if (s->Center !=  s->Center_calibration) {
                     if ((s->Center > s->Center_calibration) && (s->complete.Angle < s->Center))
                         s->Center = (s->Center_calibration > s->complete.Angle ? s->Center_calibration : s->complete.Angle); // max
-                    
+
                     if ((s->Center < s->Center_calibration) && (s->complete.Angle > s->Center))
                         s->Center = (s->Center_calibration < s->complete.Angle ? s->Center_calibration : s->complete.Angle); // min
                 }
@@ -244,7 +244,7 @@ void sensor_read_data(){
         } else {
             //if (sensor_data[side].read_timeout==10)
             //    consoleLog("\r\nSensor SOF not found");
-                
+
             if (s->read_timeout > 0){
                 s->read_timeout--;
                 if (s->read_timeout == 0){
@@ -326,7 +326,7 @@ int getSensorBaudRate(int side) {
     volatile int cycle_len = 0;
     cycle_store = malloc(sizeof(unsigned long) * MAX_SAMPLES);
     cycle_len = 0;
-    
+
     float rate = 0;
     uint16_t pin;
     GPIO_TypeDef *gpioport;
@@ -371,7 +371,7 @@ int getSensorBaudRate(int side) {
             }
         }
 
-        
+
         int total_cycles = 0;
         int num_cycles = 0;
         for (int i = 0; i < cycle_len-1; i++) {
