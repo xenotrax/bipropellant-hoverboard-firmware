@@ -194,11 +194,11 @@
 #endif
 // note: these two are now set from main based on 80/70 being (maybe) ok at 8khz
 #ifndef COMM_DEACV_HI
-  #define COMM_DEACV_HI          30   // [rpm] Commutation method deactivation speed high (above this value the control switches from Commutation method to Selected method above)
+  #define COMM_DEACV_HI          60   // [rpm] Commutation method deactivation speed high (above this value the control switches from Commutation method to Selected method above)
 #endif
 
 #ifndef COMM_ACV_LO
-  #define COMM_ACV_LO            15   // [rpm] Commutation method activation speed low
+  #define COMM_ACV_LO            30   // [rpm] Commutation method activation speed low
 #endif
 
 // How to calibrate: connect GND and RX of a 3.3v uart-usb adapter to the right sensor board cable (be careful not to use the red wire of the cable. 15v will destroye verything.). if you are using nunchuck, disable it temporarily. enable DEBUG_SERIAL_USART3 and DEBUG_SERIAL_ASCII use asearial terminal.
@@ -233,7 +233,7 @@
 #endif
 
 #ifndef DC_CUR_LIMIT
-  #define DC_CUR_LIMIT     15         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
+  #define DC_CUR_LIMIT     20         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
 #endif
 
 // Board overheat detection: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45°C). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20°C warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.

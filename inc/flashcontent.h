@@ -30,7 +30,7 @@
 // decimal to make it easier to type!
 #pragma once
 
-#define CURRENT_MAGIC 1234
+#define CURRENT_MAGIC 1237
 
 #pragma pack(push, 2) // all variables of type unsigned short (2 bytes)
 typedef struct tag_FLASH_CONTENT{
