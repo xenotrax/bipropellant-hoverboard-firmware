@@ -337,7 +337,7 @@
 #endif
 
 #ifndef ADC_OFF_FILTER
-  #define ADC_OFF_FILTER 1.0          // Additional low pass Filter applied only to ADC Off functionality. 1.0=No Filter, 0.1 lots of Filtering
+  #define ADC_OFF_FILTER 1.0f         // Additional low pass Filter applied only to ADC Off functionality. 1.0=No Filter, 0.1 lots of Filtering
 #endif
 
 #ifndef ADC_SWITCH_CHANNELS
@@ -348,8 +348,12 @@
   #define ADC_REVERSE_STEER 1         // define if ADC1 is used for Steer and ADC2 for Speed
 #endif
 
-#ifndef ADC_QUADRATIC_STEER
+#ifndef ADC_SQUARED_STEER
   #define ADC_SQUARED_STEER 0         // define if Steering be not be linear but squared
+#endif
+
+#ifndef ADC_RELATIVE_STEER
+  #define ADC_RELATIVE_STEER 0.0f     // define if Steering should be relative to speed
 #endif
 
 #ifndef ADC_TANKMODE
