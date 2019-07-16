@@ -633,7 +633,7 @@ int main(void) {
 
     #endif // CONTROL_SENSOR
 
-    #if defined(INCLUDE_PROTOCOL)||defined(CONTROL_SENSOR)
+    #if (INCLUDE_PROTOCOL != NO_PROTOCOL)||defined(CONTROL_SENSOR)
         if (!sensor_control || !FlashContent.HoverboardEnable){
           if ((last_control_type != control_type) || (!enable)){
             // nasty things happen if it's not re-initialised
@@ -771,9 +771,9 @@ int main(void) {
         sensor_send_lights();
       #endif
 
-    #else // INCLUDE_PROTOCOL)||defined(CONTROL_SENSOR)
+    #else  // (INCLUDE_PROTOCOL != NO_PROTOCOL)||defined(CONTROL_SENSOR)
       }
-    #endif // INCLUDE_PROTOCOL)||defined(CONTROL_SENSOR)
+    #endif // (INCLUDE_PROTOCOL != NO_PROTOCOL)||defined(CONTROL_SENSOR)
 
       // ####### LOW-PASS FILTER #######
       steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
@@ -781,7 +781,7 @@ int main(void) {
 
 
       // ####### MIXER #######
-    #ifdef INCLUDE_PROTOCOL
+    #if (INCLUDE_PROTOCOL != NO_PROTOCOL)
       if(ADCcontrolActive) {
     #else
       if(1) {

@@ -1,6 +1,11 @@
 #pragma once
 #include "stm32f1xx_hal.h"
 
+#define NO_PROTOCOL 0
+#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
+
+
+
 // **************** NOTE!!!! ******
 // if using platformio env, then this is set, and config.h is ignored!!!!!
 #ifndef IGNORE_GLOBAL_CONFIG
@@ -28,6 +33,7 @@
     /// and uses softwareserial for serial control on B2/C9
     #define CONTROL_SENSOR
     #define SOFTWARE_SERIAL
+    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
     #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
     #define SOFTWARE_SERIAL_RX_PORT GPIOB
     #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
@@ -51,6 +57,7 @@
     /// and uses softwareserial for serial control on B2/C9
     #define CONTROL_SENSOR
     #define SOFTWARE_SERIAL
+    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
     #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
     #define SOFTWARE_SERIAL_RX_PORT GPIOB
     #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
@@ -74,6 +81,7 @@
     // and uses softwareserial for serial control on A2/A3 -
     // which are actually USART pins!
     #define SOFTWARE_SERIAL
+    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
     #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2    // PB10/USART3_TX Pin29      PA2/USART2_TX/ADC123_IN2  Pin16
     #define SOFTWARE_SERIAL_RX_PORT GPIOA
     #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
@@ -87,6 +95,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART2
     #define SERIAL_USART2_IT
+    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
     #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
@@ -96,6 +105,7 @@
     // hoverboard sensor functionality is disabled
     // and control is via USART3
     #define SERIAL_USART3_IT
+    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
     #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
   #endif
 
@@ -365,12 +375,8 @@
 #define SOFTWARE_SERIAL_BAUD 9600
 
 // ############################### SERIAL PROTOCOL ###############################
-#define NO_PROTOCOL 0
-#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
-
-//#define INCLUDE_PROTOCOL NO_PROTOCOL
 #ifndef INCLUDE_PROTOCOL
-  #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
+  #define INCLUDE_PROTOCOL NO_PROTOCOL
 #endif
 
 // ############################### DRIVING BEHAVIOR ###############################
@@ -406,9 +412,6 @@
 #endif
 
 
-#if (INCLUDE_PROTOCOL == NO_PROTOCOL)
-  #undef INCLUDE_PROTOCOL
-#endif
 
 // end of macro control type definitions
 //////////////////////////////////////////////////////////
@@ -471,7 +474,7 @@
   #endif
 #endif
 
-#if defined(INCLUDE_PROTOCOL)
+#if (INCLUDE_PROTOCOL != NO_PROTOCOL)
   #ifdef CONTROL_METHOD_DEFINED
     #error INCLUDE_PROTOCOL not allowed, another control Method is already defined.
   #else
@@ -495,6 +498,6 @@
   #endif
 #endif
 
-#if defined(INCLUDE_PROTOCOL) && !(defined(SERIAL_USART2_IT) || defined(SERIAL_USART3_IT) || defined(SOFTWARE_SERIAL) )
+#if (INCLUDE_PROTOCOL != NO_PROTOCOL) && !(defined(SERIAL_USART2_IT) || defined(SERIAL_USART3_IT) || defined(SOFTWARE_SERIAL) )
   #error Either SERIAL_USART2_IT, SERIAL_USART3_IT or SOFTWARE_SERIAL has to be selected when using INCLUDE_PROTOCOL.
 #endif
