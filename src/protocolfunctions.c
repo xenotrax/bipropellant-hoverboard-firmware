@@ -295,6 +295,7 @@ extern uint16_t buzzerLen;
 void fn_BuzzerData ( PROTOCOL_STAT *s, PARAMSTAT *param, uint8_t fn_type, unsigned char *content, int len ) {
     switch (fn_type) {
         case FN_TYPE_POST_WRITE:
+        case FN_TYPE_POST_READRESPONSE:
             buzzerFreq      = ((PROTOCOL_BUZZER_DATA*) (param->ptr))->buzzerFreq;
             buzzerLen       = ((PROTOCOL_BUZZER_DATA*) (param->ptr))->buzzerLen;
             buzzerPattern   = ((PROTOCOL_BUZZER_DATA*) (param->ptr))->buzzerPattern;
@@ -366,6 +367,11 @@ void fn_FlashContentMaxCurrLim ( PROTOCOL_STAT *s, PARAMSTAT *param, uint8_t fn_
 ////////////////////////////////////////////////////////////////////////////////////////////
 // initialize protocol and register functions
 int setup_protocol() {
+
+    protocol_GetTick = HAL_GetTick;
+    protocol_Delay = HAL_Delay;
+    protocol_SystemReset =HAL_NVIC_SystemReset;
+
 
     int errors = 0;
 

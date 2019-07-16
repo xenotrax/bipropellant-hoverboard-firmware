@@ -272,7 +272,6 @@ int immediate_electrical(PROTOCOL_STAT *s, char byte, char *ascii_out) {
 }
 
 int immediate_stm32(PROTOCOL_STAT *s, char byte, char *ascii_out) {
-#ifndef SKIP_STM32SPECIFIC
 //        case 'G':
     sprintf(ascii_out,
         "A:%04X B:%04X C:%04X D:%04X E:%04X\r\n"\
@@ -281,7 +280,6 @@ int immediate_stm32(PROTOCOL_STAT *s, char byte, char *ascii_out) {
         (int)(BUTTON_PORT->IDR & BUTTON_PIN)?1:0,
         (int)(CHARGER_PORT->IDR & CHARGER_PIN)?1:0
     );
-#endif
     return 1;
 }
 
