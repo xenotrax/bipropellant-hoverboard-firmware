@@ -1,118 +1,130 @@
 #pragma once
 #include "stm32f1xx_hal.h"
 
-#define NO_PROTOCOL 0
-#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
 
+//////////////////////////////////////////////////////////
+// macro types for the hoverboard control style
+// add to add other control combinations
+#define HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9 1
+#define USART2_CONTROLLED 2
+#define USART3_CONTROLLED 3
+#define SOFTWARE_SERIAL_A2_A3 4
+#define HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9_6WORDSENSOR 5
 
-
-// **************** NOTE!!!! ******
-// if using platformio env, then this is set, and config.h is ignored!!!!!
-#ifndef IGNORE_GLOBAL_CONFIG
-  // **************** NOTE!!!! ******
-
-  //////////////////////////////////////////////////////////
-  // macro types for the hoverboard control style
-  // add to add other control combinations
-  #define HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9 1
-  #define USART2_CONTROLLED 2
-  #define USART3_CONTROLLED 3
-  #define SOFTWARE_SERIAL_A2_A3 4
-  #define HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9_6WORDSENSOR 5
-
-  // thoery says this is the only thing you need to change....
+// thoery says this is the only thing you need to change....
+// Can also be preset from platformio.ini when using platform.io build environment
+#ifndef CONTROL_TYPE
   #define CONTROL_TYPE HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9
-  //////////////////////////////////////////////////////////
+#endif
+//////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////
-  // implementaiton of specific for macro control types
-  // provide a short explaination here
-  #if (CONTROL_TYPE == HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9)
-    // this control type allows the board to be used AS a hoverboard,
-    // responding to sensor movements when in hoverboard mode.
-    /// and uses softwareserial for serial control on B2/C9
-    #define CONTROL_SENSOR
-    #define SOFTWARE_SERIAL
-    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
-    #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
-    #define SOFTWARE_SERIAL_RX_PORT GPIOB
-    #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
-    #define SOFTWARE_SERIAL_TX_PORT GPIOC
-    //#define DEBUG_SERIAL_ASCII
-    #define DEBUG_SOFTWARE_SERIAL
-    #define FLASH_DEFAULT_HOVERBOARD_ENABLE 1
-    #define SENSOR_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
-    #define SENSOR_WORDS 10
-    #define SERIAL_USART2_IT
-    #define SERIAL_USART3_IT
-  //#define SENSOR_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
-  //#define SENSOR_WORDS 6
-  //#define SENSOR_BAUD     32100    // reported baudrate for another sensor board  (10 word 'Denver' brand hoverboards)
-    // possibly baud rate based on ~2.5ms frame interval, so baud dependent on word count?
-  #endif
+//////////////////////////////////////////////////////////
+// implementaiton of specific for macro control types
+// provide a short explaination here
+#if (CONTROL_TYPE == HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9)
+  // this control type allows the board to be used AS a hoverboard,
+  // responding to sensor movements when in hoverboard mode.
+  /// and uses softwareserial for serial control on B2/C9
+  #define READ_SENSOR
+  #define CONTROL_SENSOR
+  #define SOFTWARE_SERIAL
+  #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
+  #define SOFTWARE_SERIAL_RX_PORT GPIOB
+  #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
+  #define SOFTWARE_SERIAL_TX_PORT GPIOC
+  //#define DEBUG_SERIAL_ASCII
+  #define DEBUG_SOFTWARE_SERIAL
+//    #define USART2_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
+//    #define USART3_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
+  #define SENSOR_WORDS 10
+  #define SERIAL_USART2_IT
+  #define SERIAL_USART3_IT
+  #define USART2_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
+  #define USART3_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
+  #define USART2_WORDLENGTH UART_WORDLENGTH_9B
+  #define USART3_WORDLENGTH UART_WORDLENGTH_9B
+  #define SERIAL_USART_IT_BUFFERTYPE unsigned short
+//#define SENSOR_WORDS 6
+//#define USART2_BAUD     32100    // reported baudrate for another sensor board  (10 word 'Denver' brand hoverboards)
+//#define USART3_BAUD     32100    // reported baudrate for another sensor board  (10 word 'Denver' brand hoverboards)
+  // possibly baud rate based on ~2.5ms frame interval, so baud dependent on word count?
+#endif
 
-  #if (CONTROL_TYPE == HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9_6WORDSENSOR)
-    // this control type allows the board to be used AS a hoverboard,
-    // responding to sensor movements when in hoverboard mode.
-    /// and uses softwareserial for serial control on B2/C9
-    #define CONTROL_SENSOR
-    #define SOFTWARE_SERIAL
-    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
-    #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
-    #define SOFTWARE_SERIAL_RX_PORT GPIOB
-    #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
-    #define SOFTWARE_SERIAL_TX_PORT GPIOC
-    //#define DEBUG_SERIAL_ASCII
-    #define DEBUG_SOFTWARE_SERIAL
-    #define FLASH_DEFAULT_HOVERBOARD_ENABLE 1
-  //#define SENSOR_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
-  //#define SENSOR_WORDS 10
-    #define SENSOR_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
-    #define SENSOR_WORDS 6
-    #define SERIAL_USART2_IT
-    #define SERIAL_USART3_IT
-  //#define SENSOR_BAUD     32100    // reported baudrate for another sensor board (maybe 7 word)?
-    // possibly baud rate based on ~2.5ms frame interval, so baud dependent on word count?
-  #endif
-
-
-  #if (CONTROL_TYPE == SOFTWARE_SERIAL_A2_A3)
-    // hoverboard sensor functionality is disabled
-    // and uses softwareserial for serial control on A2/A3 -
-    // which are actually USART pins!
-    #define SOFTWARE_SERIAL
-    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
-    #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2    // PB10/USART3_TX Pin29      PA2/USART2_TX/ADC123_IN2  Pin16
-    #define SOFTWARE_SERIAL_RX_PORT GPIOA
-    #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
-    #define SOFTWARE_SERIAL_TX_PORT GPIOA
-    //#define DEBUG_SERIAL_ASCII
-  #endif
+#if (CONTROL_TYPE == HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9_6WORDSENSOR)
+  // this control type allows the board to be used AS a hoverboard,
+  // responding to sensor movements when in hoverboard mode.
+  /// and uses softwareserial for serial control on B2/C9
+  #define READ_SENSOR
+  #define CONTROL_SENSOR
+  #define SOFTWARE_SERIAL
+  #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2
+  #define SOFTWARE_SERIAL_RX_PORT GPIOB
+  #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_9
+  #define SOFTWARE_SERIAL_TX_PORT GPIOC
+  //#define DEBUG_SERIAL_ASCII
+  #define DEBUG_SOFTWARE_SERIAL
+//#define USART2_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
+//#define USART3_BAUD     52177    // control via usart from GD32 based sensor boards @52177 baud (10 word)
+//#define SENSOR_WORDS 10
+  #define USART2_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
+  #define USART3_BAUD     26315    // reported baudrate for other sensor boards (6 word)?
+  #define USART2_WORDLENGTH UART_WORDLENGTH_9B
+  #define USART3_WORDLENGTH UART_WORDLENGTH_9B
+  #define SERIAL_USART_IT_BUFFERTYPE unsigned short
+  #define SENSOR_WORDS 6
+  #define SERIAL_USART2_IT
+  #define SERIAL_USART3_IT
+//#define USART2_BAUD     32100    // reported baudrate for another sensor board (maybe 7 word)?
+//#define USART3_BAUD     32100    // reported baudrate for another sensor board (maybe 7 word)?
+  // possibly baud rate based on ~2.5ms frame interval, so baud dependent on word count?
+#endif
 
 
-  // implementaiton of specific for macro control types
-  #if (CONTROL_TYPE == USART2_CONTROLLED)
-    // hoverboard sensor functionality is disabled
-    // and control is via USART2
-    #define SERIAL_USART2_IT
-    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
+#if (CONTROL_TYPE == SOFTWARE_SERIAL_A2_A3)
+  // hoverboard sensor functionality is disabled
+  // and uses softwareserial for serial control on A2/A3 -
+  // which are actually USART pins!
+  #define SOFTWARE_SERIAL
+  #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_2    // PB10/USART3_TX Pin29      PA2/USART2_TX/ADC123_IN2  Pin16
+  #define SOFTWARE_SERIAL_RX_PORT GPIOA
+  #define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
+  #define SOFTWARE_SERIAL_TX_PORT GPIOA
+  //#define DEBUG_SERIAL_ASCII
+#endif
+
+
+// implementaiton of specific for macro control types
+#if (CONTROL_TYPE == USART2_CONTROLLED)
+  // hoverboard sensor functionality is disabled
+  // and control is via USART2
+  #define SERIAL_USART2_IT
     #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
-  #endif
+#endif
 
 
-  // implementaiton of specific for macro control types
-  #if (CONTROL_TYPE == USART3_CONTROLLED)
-    // hoverboard sensor functionality is disabled
-    // and control is via USART3
-    #define SERIAL_USART3_IT
-    #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
+// implementaiton of specific for macro control types
+#if (CONTROL_TYPE == USART3_CONTROLLED)
+  // hoverboard sensor functionality is disabled
+  // and control is via USART3
+  #define SERIAL_USART3_IT
     #define SOFTWATCHDOG_TIMEOUT 100    // Watchdog, Monitors main loop. Stops motors and shuts down when not called after xx ms.
-  #endif
+#endif
 
 
-  // **************** NOTE!!!! ******
-#endif // IGNORE_GLOBAL_CONFIG
+//////////////////////////////////////////////////////////
+// Default Values
 
+
+// ############################### ENABLE FLASH STORAGE MECHANISM ###############################
+// this includes flasharea.c and flashaccess.c
+#ifndef FLASH_STORAGE
+  #define FLASH_STORAGE 1
+#endif
+
+// ############################### ENABLE INTERRUPT READING OF HALL SENSORS FOR POSITION ###############################
+#ifndef HALL_INTERRUPTS
+  #define HALL_INTERRUPTS 1
+#endif
 
 
 #ifndef USART2_BAUD_SENSE
@@ -147,19 +159,19 @@
   #define FLASH_DEFAULT_HOVERBOARD_ENABLE 1
 #endif
 #ifndef USART2_BAUD
-  #define USART2_BAUD 26315
+  #define USART2_BAUD 115200
 #endif
 #ifndef USART3_BAUD
-  #define USART3_BAUD 26315
+  #define USART3_BAUD 115200
 #endif
 #ifndef SERIAL_USART_IT_BUFFERTYPE
-  #define SERIAL_USART_IT_BUFFERTYPE unsigned short
+  #define SERIAL_USART_IT_BUFFERTYPE unsigned char
 #endif
 #ifndef USART2_WORDLENGTH
-  #define USART2_WORDLENGTH UART_WORDLENGTH_9B
+  #define USART2_WORDLENGTH UART_WORDLENGTH_8B
 #endif
 #ifndef USART3_WORDLENGTH
-  #define USART3_WORDLENGTH UART_WORDLENGTH_9B
+  #define USART3_WORDLENGTH UART_WORDLENGTH_8B
 #endif
 
 #ifndef SOFTWARE_SERIAL_BAUD
@@ -234,7 +246,7 @@
 #endif
 
 #ifndef DC_CUR_LIMIT
-  #define DC_CUR_LIMIT     20         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
+  #define DC_CUR_LIMIT     15         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
 #endif
 
 // Board overheat detection: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45°C). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20°C warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.
@@ -375,9 +387,15 @@
 #define SOFTWARE_SERIAL_BAUD 9600
 
 // ############################### SERIAL PROTOCOL ###############################
+#define NO_PROTOCOL 0
+#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
+
+//#define INCLUDE_PROTOCOL NO_PROTOCOL
 #ifndef INCLUDE_PROTOCOL
-  #define INCLUDE_PROTOCOL NO_PROTOCOL
+  #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
 #endif
+// Log PWM value in position/speed control mode
+//define LOG_PWM
 
 // ############################### DRIVING BEHAVIOR ###############################
 
@@ -412,6 +430,9 @@
 #endif
 
 
+#if (INCLUDE_PROTOCOL == NO_PROTOCOL)
+  #undef INCLUDE_PROTOCOL
+#endif
 
 // end of macro control type definitions
 //////////////////////////////////////////////////////////
@@ -474,7 +495,7 @@
   #endif
 #endif
 
-#if (INCLUDE_PROTOCOL != NO_PROTOCOL)
+#if defined(INCLUDE_PROTOCOL)
   #ifdef CONTROL_METHOD_DEFINED
     #error INCLUDE_PROTOCOL not allowed, another control Method is already defined.
   #else
@@ -498,6 +519,6 @@
   #endif
 #endif
 
-#if (INCLUDE_PROTOCOL != NO_PROTOCOL) && !(defined(SERIAL_USART2_IT) || defined(SERIAL_USART3_IT) || defined(SOFTWARE_SERIAL) )
+#if defined(INCLUDE_PROTOCOL) && !(defined(SERIAL_USART2_IT) || defined(SERIAL_USART3_IT) || defined(SOFTWARE_SERIAL) )
   #error Either SERIAL_USART2_IT, SERIAL_USART3_IT or SOFTWARE_SERIAL has to be selected when using INCLUDE_PROTOCOL.
 #endif
