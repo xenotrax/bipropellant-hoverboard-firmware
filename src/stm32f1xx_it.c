@@ -279,7 +279,7 @@ void EXTI4_IRQHandler(void)
 // actual IRQ for LEFT pins 5,6,7
 void EXTI9_5_IRQHandler(void)
 {
-  unsigned long triggered = 0;
+  uint32_t triggered = 0;
   if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_9) != RESET)
   {
     /* Clear the EXTI line 8 pending bit */
@@ -329,7 +329,7 @@ void EXTI9_5_IRQHandler(void)
 // actual IRQ for RIGHT pins 10, 11, 12
 void EXTI15_10_IRQHandler(void)
 {
-  unsigned long triggered = 0;
+  uint32_t triggered = 0;
   if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_15) != RESET)
   {
     /* Clear the EXTI line 8 pending bit */

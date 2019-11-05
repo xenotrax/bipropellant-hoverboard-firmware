@@ -610,7 +610,7 @@ int line_read_memory(PROTOCOL_STAT *s, char *cmd, char *ascii_out) {
             len = res;
         }
     } else {
-        sscanf(&cmd[1], "%lx,%x", (unsigned long *)&addr, &len);
+        sscanf(&cmd[1], "%lx,%x", (uint32_t *)&addr, &len);
     }
     strcat( ascii_out, "\r\n" );
     for (int a = 0; a < len; a++) {

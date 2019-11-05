@@ -322,9 +322,9 @@ void sensor_send_lights(){
 #define MAX_SAMPLES 100
 
 int getSensorBaudRate(int side) {
-    unsigned long *cycle_store = NULL;
+    uint32_t *cycle_store = NULL;
     volatile int cycle_len = 0;
-    cycle_store = malloc(sizeof(unsigned long) * MAX_SAMPLES);
+    cycle_store = malloc(sizeof(uint32_t) * MAX_SAMPLES);
     cycle_len = 0;
 
     float rate = 0;
@@ -342,8 +342,8 @@ int getSensorBaudRate(int side) {
     char t[100];
 
     __disable_irq(); // but we want all values at the same time, without interferance
-    unsigned long start_cycles = DWT->CYCCNT;
-    unsigned long cycles = start_cycles;
+    uint32_t start_cycles = DWT->CYCCNT;
+    uint32_t cycles = start_cycles;
     char value = (gpioport->IDR & pin)?1:0;
     do {
         cycles = DWT->CYCCNT;
@@ -358,9 +358,9 @@ int getSensorBaudRate(int side) {
     __enable_irq(); // but we want all values at the same time, without interferance
 
     if (cycle_len > 10) {
-        unsigned long first_time = cycle_store[0];
-        unsigned long last_time = cycle_store[cycle_len-1];
-        unsigned long total_time = last_time - first_time;
+        uint32_t first_time = cycle_store[0];
+        uint32_t last_time = cycle_store[cycle_len-1];
+        uint32_t total_time = last_time - first_time;
 
         // convert to difference
         int min_cycles = 100000;
