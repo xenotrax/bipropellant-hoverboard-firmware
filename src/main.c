@@ -353,7 +353,15 @@ int main(void) {
 
 
   // sets up serial ports, and enables protocol on selected ports
-  setup_protocol();
+#if defined(SOFTWARE_SERIAL) && (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
+    setup_protocol(&sSoftwareSerial);
+#endif
+#if defined(SERIAL_USART2_IT) && (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
+    setup_protocol(&sUSART2);
+#endif
+#if defined(SERIAL_USART3_IT) && (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2) && !defined(CONTROL_SENSOR)
+    setup_protocol(&sUSART3);
+#endif
 
   int last_control_type = CONTROL_TYPE_NONE;
 
@@ -994,7 +1002,16 @@ int main(void) {
 
     ////////////////////////////////
     // increase input_timeout_counter
-    if(!enable_immediate) input_timeout_counter++;
+
+// TODO: What to do when multiple interfaces have the protocol attached?
+#ifdef SOFTWARE_SERIAL
+    if(!sSoftwareSerial.ascii.enable_immediate) input_timeout_counter++;
+#elif defined(SERIAL_USART2_IT)
+    if(!sUSART2.ascii.enable_immediate) input_timeout_counter++;
+#elif defined(SERIAL_USART3_IT) && !defined(CONTROL_SENSOR)
+    if(!sUSART3.ascii.enable_immediate) input_timeout_counter++;
+#endif
+
   }
 }
 
