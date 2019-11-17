@@ -90,7 +90,7 @@ void fn_SensorData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROT
             memcpy(&sensor_copy[1], &sensor_data[1].complete, sizeof(sensor_copy[1]));
             break;
     }
-    fn_defaultProcessing(s, param, cmd, msg);
+    fn_defaultProcessingReadOnly(s, param, cmd, msg);
 }
 
 #endif
@@ -460,7 +460,6 @@ int setup_protocol(PROTOCOL_STAT *s) {
     #endif
 
         errors += setParamVariable( s, 0x02, UI_NONE, (void *)&HallData, sizeof(HallData) );
-        setParamHandler( s, 0x02, fn_defaultProcessing );
 
         errors += setParamVariable( s, 0x03, UI_NONE, &SpeedData, sizeof(SpeedData) );
         setParamHandler( s, 0x03, fn_SpeedData );
@@ -477,7 +476,6 @@ int setup_protocol(PROTOCOL_STAT *s) {
         setParamHandler( s, 0x07, fn_RawPosition );
 
         errors += setParamVariable( s, 0x08, UI_NONE, (void *)&electrical_measurements, sizeof(ELECTRICAL_PARAMS) );
-        setParamHandler( s, 0x08, fn_defaultProcessing );
 
         errors += setParamVariable( s, 0x09, UI_CHAR, &protocol_enable, sizeof(enable) );
         setParamHandler( s, 0x09, fn_enable );
@@ -534,4 +532,19 @@ int setup_protocol(PROTOCOL_STAT *s) {
 
     return errors;
 
+}
+
+
+void consoleLog(char *message) {
+    #ifdef DEBUG_SOFTWARE_SERIAL
+        if (debug_out) protocol_send_text(&sSoftwareSerial, message, PROTOCOL_SOM_NOACK);
+    #endif
+
+    #ifdef SERIAL_USART2_IT
+        if (debug_out) protocol_send_text(&sUSART2, message, PROTOCOL_SOM_NOACK);
+    #endif
+
+    #if defined(SERIAL_USART3_IT) && !defined(CONTROL_SENSOR)
+        if (debug_out) protocol_send_text(&sUSART3, message, PROTOCOL_SOM_NOACK);
+    #endif
 }
