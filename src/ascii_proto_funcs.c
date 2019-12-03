@@ -99,7 +99,7 @@ static char *control_types[]={
 ///////////////////////////////////////////////
 
 
-extern int protocol_post(PROTOCOL_STAT *s, PROTOCOL_MSG2 *msg);
+extern int protocol_post(PROTOCOL_STAT *s, PROTOCOL_MSG3full *msg);
 
 
 
@@ -362,16 +362,15 @@ int line_generic_var(PROTOCOL_STAT *s, char *cmd, char *ascii_out) {
                                 {
                                     // read it
 
-                                    PROTOCOL_MSG2 newMsg;
-                                    memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG2));
-                                    PROTOCOL_BYTES_WRITEVALS *writevals = (PROTOCOL_BYTES_WRITEVALS *) &(newMsg.bytes);
+                                    PROTOCOL_MSG3full newMsg;
+                                    memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG3full));
 
                                     if (s->params[i]->fn) s->params[i]->fn( s, s->params[i], PROTOCOL_CMD_SILENTREAD, &newMsg);
 
                                     sprintf(ascii_out, "%s(%s): %d\r\n",
                                             (s->params[i]->description)?s->params[i]->description:"",
                                             s->params[i]->uistr,
-                                            (int)*(short *)writevals->content);
+                                            (int)*(short *)newMsg.content);
                                     s->send_serial_data_wait((unsigned char *)ascii_out, strlen(ascii_out));
                                     ascii_out[0] = 0; // don't print last one twice
                                     break;
@@ -394,13 +393,12 @@ int line_generic_var(PROTOCOL_STAT *s, char *cmd, char *ascii_out) {
                                         // if number supplied, write
                                         if ((cmd[1+strlen(s->params[i]->uistr)] >= '0') && (cmd[1+strlen(s->params[i]->uistr)] <= '9')){
 
-                                            PROTOCOL_MSG2 newMsg;
-                                            memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG2));
-                                            PROTOCOL_BYTES_WRITEVALS *writevals = (PROTOCOL_BYTES_WRITEVALS *) &(newMsg.bytes);
+                                            PROTOCOL_MSG3full newMsg;
+                                            memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG3full));
 
-                                            *((short *)writevals->content) = atoi(&cmd[1+strlen(s->params[i]->uistr)]);
-                                            writevals->code = s->params[i]->code;
-                                            writevals->cmd = PROTOCOL_CMD_READVALRESPONSE;
+                                            *((short *)newMsg.content) = atoi(&cmd[1+strlen(s->params[i]->uistr)]);
+                                            newMsg.code = s->params[i]->code;
+                                            newMsg.cmd = PROTOCOL_CMD_READVALRESPONSE;
 
                                             if (s->params[i]->fn) s->params[i]->fn( s, s->params[i], PROTOCOL_CMD_READVALRESPONSE, &newMsg);
 
@@ -411,9 +409,8 @@ int line_generic_var(PROTOCOL_STAT *s, char *cmd, char *ascii_out) {
                                                 (int)*(short *)s->params[i]->ptr);
                                         } else {
                                             // read it
-                                            PROTOCOL_MSG2 newMsg;
-                                            memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG2));
-                                            PROTOCOL_BYTES_WRITEVALS *writevals = (PROTOCOL_BYTES_WRITEVALS *) &(newMsg.bytes);
+                                            PROTOCOL_MSG3full newMsg;
+                                            memset((void*)&newMsg,0x00,sizeof(PROTOCOL_MSG3full));
 
                                             if (s->params[i]->fn) s->params[i]->fn( s, s->params[i], PROTOCOL_CMD_SILENTREAD, &newMsg);
 
@@ -595,7 +592,7 @@ int line_test_message(PROTOCOL_STAT *s, char *cmd, char *ascii_out) {
             case 'T':
             case 't':{
                     char tmp[] = { PROTOCOL_SOM_ACK, 0, 5, PROTOCOL_CMD_TEST, 'T', 'e', 's', 't' };
-                    protocol_post(s, (PROTOCOL_MSG2*)tmp);
+                    protocol_post(s, (PROTOCOL_MSG3full*)tmp);
                 }
                 break;
         }

@@ -43,7 +43,7 @@ extern int main_ascii_init(PROTOCOL_STAT *s); // from ascii_proto_funcs.c
 // make values safe before we change enable...
 
 char protocol_enable = 0;
-void fn_enable ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_enable ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_READVAL:
         case PROTOCOL_CMD_SILENTREAD:
@@ -81,7 +81,7 @@ extern SENSOR_DATA sensor_data[2];
 // used to send only pertinent data, not the whole structure
 PROTOCOL_SENSOR_FRAME sensor_copy[2];
 
-void fn_SensorData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_SensorData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_READVAL:
         case PROTOCOL_CMD_SILENTREAD:
@@ -112,7 +112,7 @@ PROTOCOL_SPEED_DATA SpeedData = {
 };
 
 
-void fn_SpeedData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_SpeedData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_WRITEVAL:
         case PROTOCOL_CMD_READVALRESPONSE:
@@ -128,7 +128,7 @@ void fn_SpeedData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTO
 
 POSN Position;
 
-void fn_Position ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_Position ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_READVAL:
         case PROTOCOL_CMD_SILENTREAD:
@@ -155,7 +155,7 @@ void fn_Position ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOC
 
 POSN_INCR PositionIncr;
 
-void fn_PositionIncr ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_PositionIncr ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
 
     fn_defaultProcessing(s, param, cmd, msg);
 
@@ -196,7 +196,7 @@ PROTOCOL_POSN_DATA PosnData = {
 
 PROTOCOL_POSN RawPosition;
 
-void fn_RawPosition ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_RawPosition ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_READVAL:
         case PROTOCOL_CMD_SILENTREAD:
@@ -237,7 +237,7 @@ extern uint8_t debug_out;
 // ded reckoning posn
 extern INTEGER_XYT_POSN xytPosn;
 
-void fn_xytPosn ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_xytPosn ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
 
     fn_defaultProcessing(s, param, cmd, msg);
 
@@ -267,7 +267,7 @@ PROTOCOL_PWM_DATA PWMData = {
 
 extern int pwms[2];
 
-void fn_PWMData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_PWMData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_WRITEVAL:
         case PROTOCOL_CMD_READVALRESPONSE:
@@ -312,7 +312,7 @@ extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1,
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
 extern uint16_t buzzerLen;
 
-void fn_BuzzerData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_BuzzerData ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
     switch (cmd) {
         case PROTOCOL_CMD_READVAL:
         case PROTOCOL_CMD_SILENTREAD:
@@ -344,7 +344,7 @@ extern void init_PID_control();
 
 extern volatile ELECTRICAL_PARAMS electrical_measurements;
 
-void fn_FlashContentMagic ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_FlashContentMagic ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
 
     fn_defaultProcessing(s, param, cmd, msg);
 
@@ -364,7 +364,7 @@ void fn_FlashContentMagic ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cm
     }
 }
 
-void fn_FlashContentPID ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_FlashContentPID ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
 
     fn_defaultProcessing(s, param, cmd, msg);
 
@@ -376,7 +376,7 @@ void fn_FlashContentPID ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd,
     }
 }
 
-void fn_FlashContentMaxCurrLim ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG2 *msg ) {
+void fn_FlashContentMaxCurrLim ( PROTOCOL_STAT *s, PARAMSTAT *param, unsigned char cmd, PROTOCOL_MSG3full *msg ) {
 
     fn_defaultProcessing(s, param, cmd, msg);
 

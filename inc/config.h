@@ -220,7 +220,7 @@
 #endif
 
 #ifndef INPUT_TIMEOUT
-  #define INPUT_TIMEOUT    30         // number of wrong / missing input commands before wheels are disabled
+  #define INPUT_TIMEOUT    60         // number of wrong / missing input commands before wheels are disabled
 #endif
 
 #ifndef SOFTWATCHDOG_TIMEOUT
