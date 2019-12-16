@@ -87,8 +87,19 @@ static float WheelSize_mm = (DEFAULT_WHEEL_SIZE_INCHES * 25.4);
 void HallInterruptinit(void){
     memset((void *)&HallData, 0, sizeof(HallData));
     memset((void *)&local_hall_params, 0, sizeof(local_hall_params));
+
+#if (INVERT_L_DIRECTION == 1)
     local_hall_params[0].direction = -1;
+#else
+    local_hall_params[0].direction = 1;
+#endif
+
+
+#if (INVERT_R_DIRECTION == 1)
     local_hall_params[1].direction = 1;
+#else
+    local_hall_params[1].direction = -1;
+#endif
 
     // overrides local fle default
     #ifdef WHEEL_SIZE_INCHES

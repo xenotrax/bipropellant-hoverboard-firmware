@@ -125,7 +125,11 @@
   // and control is via USART2
   #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
   #define SERIAL_USART2_IT
-  #define PASE_ADV_ENA 0
+  #define PHASE_ADV_ENA      0
+  #define INVERT_R_DIRECTION 0
+  #define INVERT_L_DIRECTION 0
+  #define SWITCH_WHEELS      1
+  #define WHEEL_SIZE_INCHES 10
 #endif
 
 
@@ -135,7 +139,7 @@
   // and control is via USART3
   #define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
   #define SERIAL_USART3_IT
-  #define PASE_ADV_ENA 0
+  #define PHASE_ADV_ENA 0
 #endif
 
 
