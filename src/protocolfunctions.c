@@ -526,10 +526,9 @@ int setup_protocol(PROTOCOL_STAT *s) {
         errors += setParamVariable( s, 0x89, UI_SHORT, &FlashContent.MaxCurrLim, sizeof(short) );
         setParamHandler( s, 0x89, fn_FlashContentMaxCurrLim );
 
-        errors += setParamVariable( s, 0x89, UI_SHORT, &FlashContent.HoverboardEnable, sizeof(short) );
+        errors += setParamVariable( s, 0x90, UI_NONE, &FlashContent.adc, sizeof(PROTOCOL_ADC_SETTINGS) );
 
-
-
+        errors += setParamVariable( s, 0xA0, UI_SHORT, &FlashContent.HoverboardEnable, sizeof(short) );
     return errors;
 
 }

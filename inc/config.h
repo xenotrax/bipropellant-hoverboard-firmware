@@ -149,6 +149,12 @@
   #define FLASH_STORAGE 1
 #endif
 
+#ifndef FLASH_DEFAULT_HOVERBOARD_ENABLE
+  #define FLASH_DEFAULT_HOVERBOARD_ENABLE 0
+#endif
+
+#define CURRENT_MAGIC 1238
+
 // ############################### ENABLE INTERRUPT READING OF HALL SENSORS FOR POSITION ###############################
 #ifndef HALL_INTERRUPTS
   #define HALL_INTERRUPTS 1
